@@ -1,10 +1,11 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
 
 const Table = ({ columns, data, handleEdit, handleDelete }) => {
-    console.log("handleDelete:", handleDelete);  // Debugging line
+    // console.log("handleDelete:", handleDelete);  // Debugging line
 
   return (
-    <div className="overflow-x-auto shadow-lg rounded-lg border border-gray-200">
+    <div className="overflow-x-auto  rounded-lg border border-gray-200">
       <table className="min-w-full bg-white rounded-lg overflow-hidden">
         <thead className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
           <tr>
@@ -37,20 +38,14 @@ const Table = ({ columns, data, handleEdit, handleDelete }) => {
                 </td>
               ))}
               {/* Actions Column */}
-              <td className="py-4 px-6 text-sm font-medium border-b border-gray-200">
-                <div className="flex space-x-2">
-                <button
-                    onClick={() => handleEdit(row)}
-                    className="text-blue-500 hover:text-blue-700 p-2 border rounded"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(row.id)} // Assuming 'id' is the identifier for a service
-                    className="text-red-500 hover:text-red-700 p-2 border rounded"
-                  >
-                    Delete
-                  </button>
+              <td className="py-4 px-6 text-sm text-center font-medium border-b border-gray-200">
+                <div className="flex space-x-4 justify-center">
+                <Pencil   onClick={() => handleEdit(row)}
+                    className="text-yellow-500 hover:text-yellow-700 " />
+              
+                  <Trash2   onClick={() => handleDelete(row.id)} // Assuming 'id' is the identifier for a service
+                    className="text-red-500 hover:text-red-700  " />
+                 
                 
                 </div>
               </td>

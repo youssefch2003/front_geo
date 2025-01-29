@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Table from './Table';
 import { fetchServices, addService, editService, deleteService } from '../../api/axiosService'; // Assuming you have these functions for editing and deleting services
 import ServiceModal from './ServiceModal';
+import { useToaster } from 'rsuite';
+import Toast from '../../utils/Toast';
 
 const Services = () => {
   const [services, setServices] = useState([]); // State to hold services data
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [serviceToEdit, setServiceToEdit] = useState(null);
+  const [toasts, setToasts] = useState([]); // State to manage toasts
+
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -15,7 +19,7 @@ const Services = () => {
   };
 
   const columns = [
-    { Header: 'Name', accessor: 'name' },
+    { Header: 'Nom', accessor: 'name' },
     { Header: 'Responsable', accessor: 'responsable_name' },
    
   ];
@@ -58,23 +62,43 @@ const Services = () => {
   const handleNewService = async (newService) => {
     try {
       if (serviceToEdit) {
-        // Make API call to edit the service if editing
-        await editService(serviceToEdit.id, newService); // Assuming 'id' is the unique identifier
+        await editService(serviceToEdit.id, newService);
+        setToasts(prevToasts => [
+          ...prevToasts,
+          { type: 'success', message: 'Le service a été mis à jour.' }
+        ]);
       } else {
-        // Make API call to create the new service
         await addService(newService);
+        setToasts(prevToasts => [
+          ...prevToasts,
+          { type: 'success', message: 'Le service a été ajouté.' }
+        ]);
       }
+      await loadServices();
+      toggleModal();
 
-      // After service is created or updated, fetch the updated list of services
-      loadServices(); // Trigger a reload of services after adding or editing
+      // Supprimer le toast après 5 secondes (5000ms)
+      setTimeout(() => {
+        setToasts(prevToasts => prevToasts.filter(toast => toast.message !== 'Le service a été mis à jour.' && toast.message !== 'Le service a été ajouté.'));
+      }, 5000);
 
-      // Close the modal after service is created or updated
-      setIsModalOpen(false);
-      setServiceToEdit(null); // Reset the edit state after success
     } catch (error) {
-      console.error('Error saving service:', error);
+      console.error('Erreur lors de la sauvegarde du service :', error);
+      setToasts(prevToasts => [
+        ...prevToasts,
+        { type: 'error', message: 'Il y a eu un problème lors de la sauvegarde du service.' }
+      ]);
+      
+      // Supprimer le toast d'erreur après 5 secondes
+      setTimeout(() => {
+        setToasts(prevToasts => prevToasts.filter(toast => toast.message !== 'Il y a eu un problème lors de la sauvegarde du service.'));
+      }, 5000);
     }
-  };
+};
+
+
+
+  
 
   // Function to handle service editing
   const handleEdit = (service) => {
@@ -82,15 +106,38 @@ const Services = () => {
     setIsModalOpen(true); // Open modal in edit mode
   };
 
-  // Function to handle service deletion
   const handleDelete = async (serviceId) => {
     try {
-      await deleteService(serviceId);  // Make sure deleteService is working correctly
-      loadServices();  // Reload services after deleting
+      await deleteService(serviceId);  // Supprimer le service
+      loadServices();  // Recharger les services après la suppression
+  
+      // Afficher un toast de succès
+      setToasts(prevToasts => [
+        ...prevToasts,
+        { type: 'success', message: 'Le service a été supprimé avec succès.' }
+      ]);
+  
+      // Supprimer le toast de succès après 5 secondes
+      setTimeout(() => {
+        setToasts(prevToasts => prevToasts.filter(toast => toast.message !== 'Le service a été supprimé avec succès.'));
+      }, 5000);
+  
     } catch (error) {
-      console.error('Error deleting service:', error);
+      console.error('Erreur lors de la suppression du service :', error);
+  
+      // Afficher un toast d'erreur
+      setToasts(prevToasts => [
+        ...prevToasts,
+        { type: 'error', message: 'Il y a eu un problème lors de la suppression du service.' }
+      ]);
+  
+      // Supprimer le toast d'erreur après 5 secondes
+      setTimeout(() => {
+        setToasts(prevToasts => prevToasts.filter(toast => toast.message !== 'Il y a eu un problème lors de la suppression du service.'));
+      }, 5000);
     }
   };
+  
 
   return (
     <div className="p-4">
@@ -113,16 +160,31 @@ const Services = () => {
         </button>
       </div>
 
-      {/* Table with filtered data */}
-      <Table columns={columns} data={filteredData} />
       
-      {/* Pass the handleNewService function as a prop */}
-      <Table 
-  columns={columns} 
-  data={filteredData} 
-  handleEdit={handleEdit} 
-  handleDelete={handleDelete}
+      
+            {/* Pass the handleNewService function as a prop */}
+            <Table 
+        columns={columns} 
+        data={filteredData} 
+        handleEdit={handleEdit} 
+        handleDelete={handleDelete}
+      />
+      <ServiceModal 
+  isOpen={isModalOpen} 
+  onClose={toggleModal} 
+  onServiceCreated={handleNewService} 
+  serviceToEdit={serviceToEdit} 
 />
+<div className="fixed bottom-0 right-0 p-4 space-y-4">
+        {toasts.map((toast, index) => (
+          <Toast
+            key={index}
+            type={toast.type}
+            message={toast.message}
+            onClose={() => setToasts(toasts.filter((_, i) => i !== index))}
+          />
+        ))}
+      </div>
 
     </div>
   );

@@ -23,7 +23,9 @@ export const  fetchEmployees = async () => {
   }
 }
 // Add new service
-export const addService = async (name, responsable_id) => {
+export const addService = async ({name, responsable_id}) => {
+  console.log(name,
+    responsable_id,"drom the req")
     try {
       const response = await instanceAxios.post('/services', {
         name,
@@ -37,9 +39,13 @@ export const addService = async (name, responsable_id) => {
   };
 
   // Edit an existing service
-export const editService = async (id, name, responsable_id) => {
+export const editService = async (id,{name, responsable_id}) => {
+
     try {
-      const response = await instanceAxios.put(`/services/${id}`, {
+      const urlId = id;
+      console.log('Service ID:', urlId); // Log to confirm the ID is correct
+  
+      const response = await instanceAxios.put(`/services/${urlId}`, {
         name,
         responsable_id,
       });
