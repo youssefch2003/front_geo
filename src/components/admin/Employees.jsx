@@ -1,36 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Table from './Table';
-import { fetchEmployees, addEmployee, editEmployee, deleteEmployee } from '../../api/axiosForEmployees'; // Assuming these functions for employees
+import { fetchEmployees, editEmployee, deleteEmployee, addEmployee } from '../../api/axiosForEmployees';
 import EmployeeModal from './EmployeeModal';
 import { useToaster } from 'rsuite';
 import Toast from '../../utils/Toast';
 
+const roleOptions = ['admin', 'responsable', 'employe']; // Example role options
+
 const Employees = () => {
-  const [employees, setEmployees] = useState([]); // State to hold employees data
+  const [employees, setEmployees] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState(null);
-  const [toasts, setToasts] = useState([]); // State to manage toasts
-
+  const [toasts, setToasts] = useState([]);
+  const [editingRole, setEditingRole] = useState(null);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-    setEmployeeToEdit(null); // Reset employee to edit when modal is closed
+    setEmployeeToEdit(null);
   };
 
-  const columns = [
-    { Header: 'Prénom', accessor: 'firstName' },
-    { Header: 'Nom', accessor: 'lastName' },
-    { Header: 'Email', accessor: 'email' },
-    { Header: 'Statut', accessor: 'status' },
-    { Header: 'Service', accessor: 'service_name' },
-  ];
-
-  // Fetch employees from the backend
   const loadEmployees = async () => {
     try {
       const fetchedEmployees = await fetchEmployees();
-  
       // Flatten data for nested properties
       const processedEmployees = fetchedEmployees.map((employee) => ({
         ...employee,
@@ -40,28 +32,22 @@ const Employees = () => {
       }));
   
       setEmployees(processedEmployees);
+
     } catch (error) {
       console.error('Error fetching employees:', error);
       setEmployees([]);
     }
   };
 
-  // Load employees initially
   useEffect(() => {
     loadEmployees();
   }, []);
 
-  // Filter the data based on the search query
-  const filteredData = Array.isArray(employees)
-    ? employees.filter(
-        (employee) =>
-          employee.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.service_name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  // Function to handle employee editing
+  const handleEdit = (employee) => {
+    setEmployeeToEdit(employee);
+    setIsModalOpen(true); // Open modal in edit mode
+  };
 
   // Function to handle new employee creation
   const handleNewEmployee = async (newEmployee) => {
@@ -99,14 +85,9 @@ const Employees = () => {
         setToasts(prevToasts => prevToasts.filter(toast => toast.message !== 'Il y a eu un problème lors de la sauvegarde de l\'employé.'));
       }, 5000);
     }
-};
-
-  // Function to handle employee editing
-  const handleEdit = (employee) => {
-    setEmployeeToEdit(employee);
-    setIsModalOpen(true); // Open modal in edit mode
   };
 
+  // Function to handle employee deletion
   const handleDelete = async (employeeId) => {
     try {
       await deleteEmployee(employeeId);  // Supprimer l'employé
@@ -138,6 +119,51 @@ const Employees = () => {
       }, 5000);
     }
   };
+
+  // Filter the data based on the search query
+  const filteredData = employees.filter((employee) =>
+    Object.values(employee).some((value) =>
+      String(value).toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
+  const columns = [
+    { Header: 'Prénom', accessor: 'firstName' },
+    { Header: 'Nom', accessor: 'lastName' },
+    { Header: 'Email', accessor: 'email' },
+    { Header: 'Statut', accessor: 'status' },
+    { Header: 'Service', accessor: 'service_name' },
+    { 
+      Header: 'Rôle', 
+      accessor: 'roles', 
+      Cell: ({ row }) => {
+        const employee = row;
+        const roles = employee.roles || [];
+        const currentRole = roles.length > 0 ? roles[0].name : 'N/A';
+
+        return editingRole === employee.id ? (
+          <select
+            value={currentRole}
+            onChange={(e) => handleRoleChange(employee, e.target.value)}
+            onBlur={() => setEditingRole(null)}
+            className=' border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 '
+            autoFocus
+          >
+            {roleOptions.map((role) => (
+              <option key={role} value={role}>{role}</option>
+            ))}
+          </select>
+        ) : (
+          <span
+            onClick={() => setEditingRole(employee.id)}
+            className="cursor-pointer text-blue-500 hover:underline"
+          >
+            {currentRole}
+          </span>
+        );
+      }
+    }
+  ];
 
   return (
     <div className="p-4">
@@ -183,7 +209,6 @@ const Employees = () => {
           />
         ))}
       </div>
-
     </div>
   );
 };

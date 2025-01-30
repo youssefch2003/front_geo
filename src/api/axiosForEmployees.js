@@ -5,7 +5,7 @@ import instanceAxios from './instanceAxios';
 export const fetchEmployees = async () => {
   try {
     const response = await instanceAxios.get('/all');
-    console.log(response.data);
+    console.log(response.data.users);
     return response.data.users; // Adjust to the response structure as needed
   } catch (error) {
     console.error('Error fetching employees:', error);

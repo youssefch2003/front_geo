@@ -26,7 +26,7 @@ const LoginForm = () => {
 
       // Step 3: Dispatch loginSuccess if the login is successful
       dispatch(loginSuccess(response.data.user));
-      nav("/admin/home");
+      nav("/"+ response.data.user.role  +"/dashboard");
     } catch (error) {
       // Step 4: Dispatch loginFailure if the login fails
       dispatch(loginFailure(error.response?.data?.message || 'Échec de la connexion.'));

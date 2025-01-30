@@ -7,6 +7,10 @@ import Dashboard from './components/admin/Dashboard'
 import Layout from './components/admin/Layout'
 import Services from './components/admin/Services'
 import Employees from './components/admin/Employees'
+import DashboardEmployee from './components/employe/Dashboard'; // Renaming the employee Dashboard import
+import LayoutEmployee from './components/employe/Layout'; // Renaming the employee Dashboard import
+import Demande from './components/employe/Demande'
+
 
 function App() {
 
@@ -14,10 +18,13 @@ function App() {
    <BrowserRouter>
     <Routes>
     <Route path="/login" element={<LoginForm/>} />
-    <Route path="/employe/home" element={<Home/>} />
+    {/* admin */}
     <Route path="/admin/dashboard" element={<Layout><Dashboard /></Layout>} />
     <Route path="/admin/services" element={<Layout><Services /></Layout>} />
     <Route path="/admin/employees" element={<Layout><Employees /></Layout>} />
+    {/* employee */}
+    <Route path="/employe/dashboard" element={<LayoutEmployee><DashboardEmployee /></LayoutEmployee>} />
+    <Route path="/employe/demande" element={<LayoutEmployee><Demande /></LayoutEmployee>} />
     </Routes>
    </BrowserRouter>
   )

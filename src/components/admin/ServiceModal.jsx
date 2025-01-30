@@ -66,6 +66,10 @@ const ServiceModal = ({ isOpen, onClose, onServiceCreated, serviceToEdit }) => {
     try {
       console.log(serviceToEdit, "❤️❤️❤️❤️❤️❤️");
       await onServiceCreated(dataToSubmit, serviceToEdit?.id);
+      setServiceData({
+        name: "",
+        responsable_id: "",
+      });
       onClose();
     } catch (error) {
       console.error("Error saving service:", error);
