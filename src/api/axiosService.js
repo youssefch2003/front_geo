@@ -22,6 +22,17 @@ export const  fetchEmployees = async () => {
     console.error('Error fetching users:', error);
   }
 }
+// Get all employees
+export const fetchEmployeesSameService = async () => {
+  try {
+    const response = await instanceAxios.get(`/services/encommuns`);
+    // console.log("99999999999999999",response.data);
+    return response.data.users; // Assuming response contains users
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+}
+
 // Add new service
 export const addService = async ({name, responsable_id}) => {
   console.log(name,
