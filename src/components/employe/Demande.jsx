@@ -31,7 +31,7 @@ const Demande = () => {
     setFilteredData(
         demandeData.filter((demande) => {
           return (
-            (demande.conge_type && demande.conge_type.name && demande.conge_type.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (demande.conge_type && demande.conge_type && demande.conge_type.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (demande.motif && demande.motif.toLowerCase().includes(searchQuery.toLowerCase()))
           );
         })
@@ -56,16 +56,29 @@ const Demande = () => {
     }
   };
 
-  const handleNewDemande = async (newDemande) => {
+  const handleSaveDemande = async (demande) => {
     try {
-      const savedDemande = await addDemande(newDemande);
-      setDemandeData([...demandeData, savedDemande]);
-      setToasts([...toasts, { type: "success", message: "Demande added successfully!" }]);
+      if (demandeToEdit) {
+        await updateDemande(demandeToEdit.id, demande);
+        setToasts([...toasts, { type: "success", message: "Demande updated successfully!" }]);
+      } else {
+        await addDemande(demande);
+        setToasts([...toasts, { type: "success", message: "Demande added successfully!" }]);
+      }
+      
+      // Fetch the latest demandes
+      const updatedData = await fetchDemandes();
+      setDemandeData(updatedData);
+      
     } catch (error) {
-      setToasts([...toasts, { type: "error", message: "Error adding demande!" }]);
-      console.error("Error adding demande:", error);
+      setToasts([...toasts, { type: "error", message: "Error saving demande!" }]);
+      console.error("Error saving demande:", error);
+    } finally {
+      toggleModal();
     }
   };
+  
+  
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -92,22 +105,23 @@ const Demande = () => {
       </div>
       <Table 
         columns={[
-            { Header: "Type de congé", accessor: "conge_type.name", Cell: ({ row }) => row.original.conge_type?.name || 'N/A' },
-            { Header: "Motif", accessor: "motif", Cell: ({ row }) => row.original.motif || 'N/A' },
-            { Header: "Statut", accessor: "status", Cell: ({ row }) => row.original.status || 'N/A' },
-            { Header: "Date de début", accessor: "start_date" },
-          { Header: "Date de fin", accessor: "end_date" },
+          { Header: "Type de congé", accessor: "conge_type"},
+          { Header: "Motif", accessor: "motif" },
+          { Header: "Statut", accessor: "status"},
+            { Header: "début", accessor: "start_date" },
+          { Header: "fin", accessor: "end_date" },
         ]}
         data={filteredData}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
       />
-      <DemandeModal 
-        isOpen={isModalOpen} 
-        onClose={toggleModal} 
-        onDemandeCreated={handleNewDemande} 
-        demandeToEdit={demandeToEdit} 
-      />
+        <DemandeModal 
+      isOpen={isModalOpen} 
+      onClose={toggleModal} 
+      onDemandeCreated={handleSaveDemande} 
+      demandeToEdit={demandeToEdit} 
+    />
+
       <div className="fixed bottom-0 right-0 p-4 space-y-4">
         {toasts.map((toast, index) => (
           <Toast

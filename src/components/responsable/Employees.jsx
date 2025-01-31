@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Table from './Table';
+import Table from '../admin/Table';
 import { fetchEmployees, editEmployee, deleteEmployee, addEmployee } from '../../api/axiosForEmployees';
-import EmployeeModal from './EmployeeModal';
+import EmployeeModal from '../../components/admin/EmployeeModal';
 import { useToaster } from 'rsuite';
 import Toast from '../../utils/Toast';
 
