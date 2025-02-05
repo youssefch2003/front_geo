@@ -13,6 +13,27 @@ export const fetchDemandes = async () => {
     throw error; // Rethrow the error to be handled by the calling code
   }
 };
+// Example: Get all demandes (leave requests)
+export const fetchMyDemandes = async () => {
+  try {
+    const response = await instanceAxios.get('/demandes/mes-demandes'); // Assuming '/demandes' is the route for fetching demandes
+    // console.log(response.data); // Log response data for debugging
+    return response.data.data; // Return the fetched data
+  } catch (error) {
+    console.error('Error fetching demandes:', error); // Log errors if something goes wrong
+    throw error; // Rethrow the error to be handled by the calling code
+  }
+};
+export const getDmdForResponsable = async () => {
+  try {
+    const response = await instanceAxios.get('/service-demandes'); // Assuming '/demandes' is the route for fetching demandes
+    // console.log(response.data); // Log response data for debugging
+    return response.data.data; // Return the fetched data
+  } catch (error) {
+    console.error('Error fetching demandes:', error); // Log errors if something goes wrong
+    throw error; // Rethrow the error to be handled by the calling code
+  }
+};
 // Function to create a new demande (leave request)
 export const addDemande = async (demandeData) => {
     console.log(demandeData,"from api file ")

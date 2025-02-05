@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { fetchEmployees } from "../../api/axiosService"; // Adjust according to your API structure
-import Table from "../admin/Table"; // Make sure to import your Table component
-import DemandeModal from "./DemandeModal"; // Import the modal for adding/editing demande
+import Table from "./Table"; // Make sure to import your Table component
 import Toast from "../../utils/Toast"; // Make sure to import your Toast component
-import { fetchDemandes, addDemande, updateDemande, deleteDemande, fetchMyDemandes } from "../../api/axiosForDemande";
+import { fetchDemandes, addDemande, updateDemande, deleteDemande, getDmdForResponsable } from "../../api/axiosForDemande";
+import ResModal from "./ResModal";
+import ViewModal from "./ViewModal";
 
-const Demande = () => {
+const DemandeRes = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [demandeData, setDemandeData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [demandeToEdit, setDemandeToEdit] = useState(null);
   const [toasts, setToasts] = useState([]);
+  const [selectedDemande, setSelectedDemande] = useState(null); // New state for selected demande to view details
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // State for ViewModal visibility
 
   useEffect(() => {
     const fetchDemandeDataFromAPI = async () => {
       try {
-        const data = await fetchMyDemandes();
+        const data = await getDmdForResponsable();
         console.log(data,"6363+")
         setDemandeData(data);
       } catch (error) {
@@ -49,7 +52,7 @@ const Demande = () => {
     try {
       await deleteDemande(id);
       setDemandeData(demandeData.filter(demande => demande.id !== id));
-      setToasts([...toasts, { type: "success", message: "Demande deleted successfully!" }]);
+      setToasts([...toasts, { type: "success", message: "Demande a ete supprimer!" }]);
     } catch (error) {
       setToasts([...toasts, { type: "error", message: "Error deleting demande!" }]);
       console.error("Error deleting demande:", error);
@@ -57,17 +60,18 @@ const Demande = () => {
   };
 
   const handleSaveDemande = async (demande) => {
+    console.log("5555555555555555555555555555",demande)
     try {
       if (demandeToEdit) {
         await updateDemande(demandeToEdit.id, demande);
-        setToasts([...toasts, { type: "success", message: "Demande updated successfully!" }]);
+        setToasts([...toasts, { type: "success", message: "Demande  a été mis à jour.!" }]);
       } else {
         await addDemande(demande);
         setToasts([...toasts, { type: "success", message: "Demande added successfully!" }]);
       }
       
       // Fetch the latest demandes
-      const updatedData = await fetchMyDemandes();
+      const updatedData = await getDmdForResponsable();
       setDemandeData(updatedData);
       
     } catch (error) {
@@ -77,7 +81,15 @@ const Demande = () => {
       toggleModal();
     }
   };
-  
+  const handleView = (demande) => {
+    setSelectedDemande(demande);
+    setIsViewModalOpen(true); // Open ViewModal when a demande is selected
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false); // Close the ViewModal
+    setSelectedDemande(null);
+  };
   
 
   const toggleModal = () => {
@@ -96,12 +108,12 @@ const Demande = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="p-2 border border-gray-300 rounded-lg w-64"
         />
-        <button
+        {/* <button
           onClick={() => setIsModalOpen(true)}
           className="py-2 px-6 text-sm font-medium text-gray-900 bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
         >
           Ajouter
-        </button>
+        </button> */}
       </div>
       <Table 
         columns={[
@@ -114,14 +126,27 @@ const Demande = () => {
         data={filteredData}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
+        handleView={handleView} 
+
       />
-        <DemandeModal 
+        {/* <DemandeModal 
       isOpen={isModalOpen} 
       onClose={toggleModal} 
       onDemandeCreated={handleSaveDemande} 
       demandeToEdit={demandeToEdit} 
-    />
+    /> */}
+    <ResModal 
+  isOpen={isModalOpen} 
+  onClose={toggleModal} 
+  onDemandeUpdated={handleSaveDemande} 
+  demandeToEdit={demandeToEdit} 
+/>
 
+<ViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleCloseViewModal}
+        demande={selectedDemande}
+      />
       <div className="fixed bottom-0 right-0 p-4 space-y-4">
         {toasts.map((toast, index) => (
           <Toast
@@ -136,4 +161,4 @@ const Demande = () => {
   );
 };
 
-export default Demande;
+export default DemandeRes;

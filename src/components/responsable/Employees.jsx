@@ -4,6 +4,7 @@ import { fetchEmployees, editEmployee, deleteEmployee, addEmployee } from '../..
 import EmployeeModal from '../../components/admin/EmployeeModal';
 import { useToaster } from 'rsuite';
 import Toast from '../../utils/Toast';
+import { fetchEmployeesSameService } from '../../api/axiosService';
 
 const roleOptions = ['admin', 'responsable', 'employe']; // Example role options
 
@@ -22,7 +23,7 @@ const Employees = () => {
 
   const loadEmployees = async () => {
     try {
-      const fetchedEmployees = await fetchEmployees();
+      const fetchedEmployees = await fetchEmployeesSameService();
       // Flatten data for nested properties
       const processedEmployees = fetchedEmployees.map((employee) => ({
         ...employee,
@@ -49,53 +50,7 @@ const Employees = () => {
     setIsModalOpen(true); // Open modal in edit mode
   };
 
-  const handleRoleChange = async (employee, newRole) => {
-    try {
-      // Assuming you have an API function to update the role
-      await editEmployee(employee.id, { ...employee, role: newRole });
   
-      // Update the employee's role locally in state
-      const updatedEmployees = employees.map((emp) =>
-        emp.id === employee.id ? { ...emp, roles: [{ name: newRole }] } : emp
-      );
-      setEmployees(updatedEmployees);
-  
-      // Close the edit mode
-      setEditingRole(null);
-  
-      // Display a success toast
-      setToasts((prevToasts) => [
-        ...prevToasts,
-        { type: 'success', message: 'Rôle mis à jour avec succès.' },
-      ]);
-      
-      // Remove the success toast after 5 seconds
-      setTimeout(() => {
-        setToasts((prevToasts) =>
-          prevToasts.filter(
-            (toast) => toast.message !== 'Rôle mis à jour avec succès.'
-          )
-        );
-      }, 5000);
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du rôle:', error);
-  
-      // Display an error toast
-      setToasts((prevToasts) => [
-        ...prevToasts,
-        { type: 'error', message: 'Erreur lors de la mise à jour du rôle.' },
-      ]);
-  
-      // Remove the error toast after 5 seconds
-      setTimeout(() => {
-        setToasts((prevToasts) =>
-          prevToasts.filter(
-            (toast) => toast.message !== 'Erreur lors de la mise à jour du rôle.'
-          )
-        );
-      }, 5000);
-    }
-  };
   
 
   // Function to handle new employee creation
@@ -182,36 +137,6 @@ const Employees = () => {
     { Header: 'Email', accessor: 'email' },
     { Header: 'Statut', accessor: 'status' },
     { Header: 'Service', accessor: 'service_name' },
-    { 
-      Header: 'Rôle', 
-      accessor: 'roles', 
-      Cell: ({ row }) => {
-        const employee = row;
-        const roles = employee.roles || [];
-        const currentRole = roles.length > 0 ? roles[0].name : 'N/A';
-
-        return editingRole === employee.id ? (
-          <select
-            value={currentRole}
-            onChange={(e) => handleRoleChange(employee, e.target.value)}
-            onBlur={() => setEditingRole(null)}
-            className=' border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 '
-            autoFocus
-          >
-            {roleOptions.map((role) => (
-              <option key={role} value={role}>{role}</option>
-            ))}
-          </select>
-        ) : (
-          <span
-            onClick={() => setEditingRole(employee.id)}
-            className="cursor-pointer text-blue-500 hover:underline"
-          >
-            {currentRole}
-          </span>
-        );
-      }
-    }
   ];
 
   return (

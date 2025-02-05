@@ -12,6 +12,7 @@ import Demande from './components/employe/Demande'
 import LayoutRes from './components/responsable/LayoutRes'
 import DashboardRes from './components/responsable/DashboardRes'
 import EmployeesREs from './components/responsable/Employees'
+import DemandeRes from './components/responsable/DemandeRes'
 
 function App() {
 
@@ -29,7 +30,7 @@ function App() {
     {/* res */}
     <Route path="/responsable/dashboard" element={<LayoutRes><DashboardRes /></LayoutRes>} />
     <Route path="/responsable/employes" element={<LayoutRes><EmployeesREs /></LayoutRes>} />
-    {/* <Route path="/employe/demande" element={<LayoutEmployee><Demande /></LayoutEmployee>} /> */}
+    <Route path="/responsable/demande" element={<LayoutRes><DemandeRes /></LayoutRes>} />
     </Routes>
    </BrowserRouter>
   )
