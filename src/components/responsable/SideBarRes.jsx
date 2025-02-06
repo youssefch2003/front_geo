@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Cog, LayoutDashboard, Menu, Users } from 'lucide-react'; // Test with a basic icon like 'Menu'
+import { Calendar, ChevronLeft, ChevronRight, Cog, LayoutDashboard, Menu, Users } from 'lucide-react'; // Test with a basic icon like 'Menu'
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
 
@@ -83,7 +83,7 @@ const SideBarRes = () => {
                 href="/responsable/employes"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <LayoutDashboard  className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                <Users  className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                 />
                 
                 <span className="ms-3">Employes</span>
@@ -95,8 +95,7 @@ const SideBarRes = () => {
                 href="/responsable/demande"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <Cog   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                />
+                <Calendar   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
                 
                 <span className="ms-3">Demande de conges</span>
               </a>

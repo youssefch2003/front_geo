@@ -1,0 +1,166 @@
+import React, { useState, useEffect } from "react";
+import { fetchEmployees } from "../../api/axiosService"; // Adjust according to your API structure
+import Table from "./Table"; // Make sure to import your Table component
+import Toast from "../../utils/Toast"; // Make sure to import your Toast component
+import { fetchDemandes, addDemande, updateDemande, deleteDemande, getDmdForResponsable } from "../../api/axiosForDemande";
+import ResModal from "./ResModal";
+import ViewModal from "../responsable/ViewModal";
+
+const DemandeAdmin = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [demandeData, setDemandeData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [demandeToEdit, setDemandeToEdit] = useState(null);
+  const [toasts, setToasts] = useState([]);
+  const [selectedDemande, setSelectedDemande] = useState(null); // New state for selected demande to view details
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // State for ViewModal visibility
+
+  useEffect(() => {
+    const fetchDemandeDataFromAPI = async () => {
+      try {
+        const data = await fetchDemandes();
+        console.log(data,"552525")
+        setDemandeData(data);
+      } catch (error) {
+        console.error("Error fetching demandes:", error);
+      }
+    };
+    fetchDemandeDataFromAPI();
+  }, []);
+
+  useEffect(() => {
+   
+    setFilteredData(
+        demandeData.filter((demande) => {
+          return (
+            (demande.conge_type && demande.conge_type && demande.conge_type.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (demande.motif && demande.motif.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (demande.user && demande.user.toLowerCase().includes(searchQuery.toLowerCase()))
+          );
+        })
+      );
+      
+          
+  }, [searchQuery, demandeData]);
+  
+  const handleEdit = (demande) => {
+    setDemandeToEdit(demande);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteDemande(id);
+      setDemandeData(demandeData.filter(demande => demande.id !== id));
+      setToasts([...toasts, { type: "success", message: "Demande a ete supprimer!" }]);
+    } catch (error) {
+      setToasts([...toasts, { type: "error", message: "Error deleting demande!" }]);
+      console.error("Error deleting demande:", error);
+    }
+  };
+
+  const handleSaveDemande = async (demande) => {
+    console.log("5555555555555555555555555555",demande)
+    try {
+      if (demandeToEdit) {
+        await updateDemande(demandeToEdit.id, demande);
+        setToasts([...toasts, { type: "success", message: "Demande  a été mis à jour.!" }]);
+      } else {
+        await addDemande(demande);
+        setToasts([...toasts, { type: "success", message: "Demande added successfully!" }]);
+      }
+      
+      // Fetch the latest demandes
+      const updatedData = await fetchDemandes();
+      setDemandeData(updatedData);
+      
+    } catch (error) {
+      setToasts([...toasts, { type: "error", message: "Error saving demande!" }]);
+      console.error("Error saving demande:", error);
+    } finally {
+      toggleModal();
+    }
+  };
+  const handleView = (demande) => {
+    setSelectedDemande(demande);
+    setIsViewModalOpen(true); // Open ViewModal when a demande is selected
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false); // Close the ViewModal
+    setSelectedDemande(null);
+  };
+  
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+    setDemandeToEdit(null);
+  };
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Demandes</h1>
+      <div className="mb-4 flex justify-between">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg w-64"
+        />
+        {/* <button
+          onClick={() => setIsModalOpen(true)}
+          className="py-2 px-6 text-sm font-medium text-gray-900 bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+        >
+          Ajouter
+        </button> */}
+      </div>
+      <Table 
+        columns={[
+          { Header: "Employe", accessor: "user"},
+          { Header: "Type de congé", accessor: "conge_type"},
+          { Header: "Motif", accessor: "motif" },
+          { Header: "Statut", accessor: "status"},
+            { Header: "début", accessor: "start_date" },
+          { Header: "fin", accessor: "end_date" },
+        ]}
+        data={filteredData}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        handleView={handleView} 
+
+      />
+        {/* <DemandeModal 
+      isOpen={isModalOpen} 
+      onClose={toggleModal} 
+      onDemandeCreated={handleSaveDemande} 
+      demandeToEdit={demandeToEdit} 
+    /> */}
+    <ResModal 
+  isOpen={isModalOpen} 
+  onClose={toggleModal} 
+  onDemandeUpdated={handleSaveDemande} 
+  demandeToEdit={demandeToEdit} 
+/>
+
+<ViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleCloseViewModal}
+        demande={selectedDemande}
+      />
+      <div className="fixed bottom-0 right-0 p-4 space-y-4">
+        {toasts.map((toast, index) => (
+          <Toast
+            key={index}
+            type={toast.type}
+            message={toast.message}
+            onClose={() => setToasts(toasts.filter((_, i) => i !== index))}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default DemandeAdmin;

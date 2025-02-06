@@ -15,23 +15,27 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    dispatch(loginStart()); // Dispatch loginStart action to set status to loading
+    dispatch(loginStart()); // Set loading state
 
     try {
-      // Step 1: Get the CSRF token (this should be done before sending the login request)
-      await getCsrfToken();
+        await getCsrfToken(); // Fetch CSRF token
 
-      // Step 2: Send the login request using axiosForLogin
-      const response = await axiosForLogin.post('/login', { email, password });
+        const response = await axiosForLogin.post('/login', { email, password });
 
-      // Step 3: Dispatch loginSuccess if the login is successful
-      dispatch(loginSuccess(response.data.user));
-      nav("/"+ response.data.user.role  +"/dashboard");
+        // Ensure the role exists and is correctly assigned
+        const { user } = response.data;
+        const role = user.role; // Default to 'user' if role is missing
+
+        // Dispatch loginSuccess with user & role
+        dispatch(loginSuccess({ user, role })); 
+
+        // Navigate to the appropriate dashboard
+        nav(`/${role}/dashboard`);
     } catch (error) {
-      // Step 4: Dispatch loginFailure if the login fails
-      dispatch(loginFailure(error.response?.data?.message || 'Échec de la connexion.'));
+        dispatch(loginFailure(error.response?.data?.message || 'Échec de la connexion.'));
     }
-  };
+};
+
 
   return (
     <section className="min-h-screen flex justify-center items-center">

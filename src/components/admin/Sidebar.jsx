@@ -1,6 +1,17 @@
-import { ChevronLeft, ChevronRight, Cog, LayoutDashboard, Menu, Users } from 'lucide-react'; // Test with a basic icon like 'Menu'
-import { useState } from 'react';
-import logo from '../../assets/logo.png';
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Cog,
+  EllipsisVertical,
+  LayoutDashboard,
+  Menu,
+  Users,
+} from "lucide-react"; // Test with a basic icon like 'Menu'
+import { useState } from "react";
+import logo from "../../assets/logo.png";
+import { useSelector } from "react-redux";
+import NavMenu from "../NavMenu";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true); // Default is open
@@ -9,6 +20,9 @@ const Sidebar = () => {
     setOpen(!open);
   };
 
+  const { user } = useSelector((state) => state.auth);
+
+console.log()
   return (
     <>
       <nav className="fixed top-0 right-0 z-50 w-full  bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -39,66 +53,68 @@ const Sidebar = () => {
                 </svg>
               </button>
               <a href="#" className="flex ms-2 md:me-24">
-                <img
-                    src={logo}                   
-                    className="h-12 me-3"
-                  alt="FlowBite Logo"
-                />
-             
+                <img src={logo} className="h-12 me-3" alt="FlowBite Logo" />
               </a>
             </div>
             <div className="flex items-center">
               <div className="flex items-center ms-3">
                 <div>
-                  <h2>test test</h2>
+                  <h2>{user.firstName} {user.lastName}</h2> 
                 </div>
+                <NavMenu/>
               </div>
             </div>
           </div>
         </div>
       </nav>
-      
+
       <aside
         id="logo-sidebar"
-        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform ${open ? 'translate-x-0' : '-translate-x-full'} bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700`}
+        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform ${
+          open ? "translate-x-0" : "-translate-x-full"
+        } bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700`}
         aria-label="Sidebar"
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li>
-
               <a
                 href="/admin/dashboard"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <LayoutDashboard  className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                />
-                
+                <LayoutDashboard className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+
                 <span className="ms-3">Dashboard</span>
               </a>
             </li>
             <li>
-
               <a
                 href="/admin/services"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <Cog   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                />
-                
+                <Cog className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+
                 <span className="ms-3">Services</span>
               </a>
             </li>
             <li>
-
               <a
                 href="/admin/employees"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
-                <Users   className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                />
-                
+                <Users className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+
                 <span className="ms-3">Employes</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/admin/demande"
+                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
+                <Calendar className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+
+                <span className="ms-3">Demande de conges</span>
               </a>
             </li>
             {/* More items here */}

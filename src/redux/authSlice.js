@@ -1,7 +1,6 @@
-// src/redux/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
+import { authStatus } from '../api/authApi'; // Import authStatus API function
 
-// Status constants
 export const STATUS = {
     IDLE: 'idle',
     LOADING: 'loading',
@@ -9,44 +8,43 @@ export const STATUS = {
     ERROR: 'error',
 };
 
-// Initial state with status
 const initialState = {
     isAuthenticated: false,
     user: null,
+    role: null,
     error: null,
-    status: STATUS.IDLE, // Default status is idle
+    status: STATUS.IDLE,
 };
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        // This action is dispatched when login is in progress (e.g., when the form is submitted)
         loginStart: (state) => {
-            state.status = STATUS.LOADING; // Set status to loading
+            state.status = STATUS.LOADING;
         },
 
-        // Action when login is successful
         loginSuccess: (state, action) => {
-            state.status = STATUS.SUCCESS; // Set status to success
+            state.status = STATUS.SUCCESS;
             state.isAuthenticated = true;
-            state.user = action.payload;
+            state.user = action.payload.user;
+            state.role = action.payload.role;
             state.error = null;
         },
 
-        // Action when login fails
         loginFailure: (state, action) => {
-            state.status = STATUS.ERROR; // Set status to error
+            state.status = STATUS.ERROR;
             state.isAuthenticated = false;
             state.user = null;
+            state.role = null;
             state.error = action.payload;
         },
 
-        // Action to logout
         logout: (state) => {
-            state.status = STATUS.IDLE; // Set status to idle
+            state.status = STATUS.IDLE;
             state.isAuthenticated = false;
             state.user = null;
+            state.role = null;
             state.error = null;
         },
     },
@@ -55,3 +53,16 @@ const authSlice = createSlice({
 export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions;
 
 export default authSlice.reducer;
+
+// Async function to check authentication status
+export const checkAuthStatus = () => async (dispatch) => {
+    try {
+        const response = await authStatus(); // Call the API
+        console.log(response)
+        const r =response.role[0];
+        dispatch(loginSuccess({ user: response.user, role: r }));
+    } catch (error) {
+        console.log(error)
+        dispatch(loginFailure("Unauthorized")); // Set state to not authenticated
+    }
+};
