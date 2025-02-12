@@ -57,10 +57,10 @@ function App() {
                 />
 
                 {/* ✅ Protect Employee Routes */}
-                <Route
+                {/* <Route
                     path="/employe/dashboard"
                     element={<ProtectedRoute role={"employe"}><LayoutEmployee><DashboardEmployee /></LayoutEmployee></ProtectedRoute>}
-                />
+                /> */}
                 <Route
                     path="/employe/demande"
                     element={<ProtectedRoute role={"employe"}><LayoutEmployee><Demande /></LayoutEmployee></ProtectedRoute>}

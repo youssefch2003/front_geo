@@ -1,6 +1,8 @@
 import { Calendar, ChevronLeft, ChevronRight, Cog, LayoutDashboard, Menu, Users } from 'lucide-react'; // Test with a basic icon like 'Menu'
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
+import NavMenu from '../NavMenu';
+import { useSelector } from 'react-redux';
 
 const SideBarRes = () => {
   const [open, setOpen] = useState(true); // Default is open
@@ -8,6 +10,7 @@ const SideBarRes = () => {
   const toggleSidebar = () => {
     setOpen(!open);
   };
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <>
@@ -50,8 +53,9 @@ const SideBarRes = () => {
             <div className="flex items-center">
               <div className="flex items-center ms-3">
                 <div>
-                  <h2>test test</h2>
+                  <h2>{user.firstName} {user.lastName}</h2> 
                 </div>
+                <NavMenu/>
               </div>
             </div>
           </div>

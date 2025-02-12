@@ -1,6 +1,8 @@
 import { ChevronLeft, ChevronRight, Cog, LayoutDashboard, Menu, Users } from 'lucide-react'; // Test with a basic icon like 'Menu'
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
+import { useSelector } from 'react-redux';
+import NavMenu from '../NavMenu';
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true); // Default is open
@@ -8,6 +10,7 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setOpen(!open);
   };
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <>
@@ -50,8 +53,9 @@ const Sidebar = () => {
             <div className="flex items-center">
               <div className="flex items-center ms-3">
                 <div>
-                  <h2>test test</h2>
+                  <h2>{user.firstName} {user.lastName}</h2> 
                 </div>
+                <NavMenu/>
               </div>
             </div>
           </div>
@@ -65,7 +69,7 @@ const Sidebar = () => {
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
-            <li>
+            {/* <li>
 
               <a
                 href="/employe/dashboard"
@@ -76,7 +80,7 @@ const Sidebar = () => {
                 
                 <span className="ms-3">Dashboard</span>
               </a>
-            </li>
+            </li> */}
             <li>
 
               <a
