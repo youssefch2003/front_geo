@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 const Welcome = () => {
   const { user, role } = useSelector((state) => state.auth);
 
+  
   // Map backend roles to display names
   const roleMapping = {
     admin: 'Administrateur',
@@ -24,7 +25,7 @@ const Welcome = () => {
       case 'employe':
         return E;
       default:
-        return A; // Default image
+        return B; // Default image
     }
   };
 
